@@ -10,7 +10,7 @@
 using namespace std;
 using namespace httplib;
 
-#define cache_size 20
+#define cache_size 2
 #define pool_size 32
 
 class PGPool {
@@ -58,8 +58,8 @@ void db_put(int key, const string &value) {
     PGconn* c = dbpool.acquire();
 
     PQsetSingleRowMode(c); 
-    string q = "INSERT INTO kv_store (k, v) VALUES (" + to_string(key) + ", '" + value +
-               "') ON CONFLICT (k) DO UPDATE SET v='" + value + "';";
+    string q = "INSERT INTO kvtb (key, value) VALUES (" + to_string(key) + ", '" + value +
+               "') ON CONFLICT (key) DO UPDATE SET value='" + value + "';";
 
     PGresult *res = PQexec(c, q.c_str());
     PQclear(res);
@@ -72,7 +72,7 @@ string db_get(int key) {
     PGconn* c = dbpool.acquire();
 
     PQsetSingleRowMode(c);
-    string q = "SELECT v FROM kv_store WHERE k=" + to_string(key);
+    string q = "SELECT value FROM kvtb WHERE key=" + to_string(key);
     PGresult *res = PQexec(c, q.c_str());
 
     string value = "";
@@ -90,7 +90,7 @@ bool db_del(int key) {
     PGconn* c = dbpool.acquire();
 
     PQsetSingleRowMode(c); 
-    string q = "DELETE FROM kv_store WHERE k=" + to_string(key);
+    string q = "DELETE FROM kvtb WHERE key=" + to_string(key);
     PGresult *res = PQexec(c, q.c_str());
 
     bool ok = (string(PQcmdTuples(res)) != "0");
