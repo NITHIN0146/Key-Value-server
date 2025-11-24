@@ -10,8 +10,8 @@
 using namespace std;
 using namespace httplib;
 
-#define cache_size 2
-#define pool_size 32
+#define cache_size 1000
+#define pool_size 500
 
 class PGPool {
 private:
